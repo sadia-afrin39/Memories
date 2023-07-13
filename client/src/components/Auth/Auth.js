@@ -3,16 +3,24 @@ import { Avatar,Button, Paper, Grid, Typography, Container } from '@material-ui/
 import { LockOutlined } from '@material-ui/icons';
 import {GoogleLogin} from 'react-google-login';
 import {gapi} from 'gapi-script';
+import {useDispatch} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 
 import Input from './Input.js';
 import useStyles from './styles';
 import Icon from './icon';
+import {signin,signup} from '../../actions/auth';
+
+const initialState = {firstName: '', lastName: '', email: '', password: '', confirmPassword: '' }
 
 const Auth = () => {
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false);
     const clientId= process.env.REACT_APP_CLIENTID;
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState(initialState);
 
     useEffect(() => {
         gapi.load("client: auth2", ()=>{
@@ -20,11 +28,16 @@ const Auth = () => {
         })
     },[clientId]);
 
-    const handleSubmit = () => {
-
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if(isSignup){
+            dispatch(signup(formData,navigate));
+        }else{
+            dispatch(signin(formData,navigate));
+        }
     }
-    const handleChange = () => {
-
+    const handleChange = (e) => {
+        setFormData({...formData,[e.target.name]: e.target.value});
     }
 
     const handleShowPassword = () => {
@@ -37,8 +50,16 @@ const Auth = () => {
     }
 
     const googleSuccess = async (res) => {
-        console.log(res);
-    }
+        const result = res?.profileObj;  
+        const token = res?.tokenId;
+
+        try{
+            dispatch({type:'AUTH' , data: {result, token} });
+            navigate('/');
+        }catch(err){
+            console.log(err);
+        }
+    };
 
     const googleFailure = (err) => {
         console.log(err);
