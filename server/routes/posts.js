@@ -1,17 +1,15 @@
 import express from "express";
+
 import { getPosts,createPost,updatePost,deletePost,likePost } from "../controllers/posts.js";
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
 //localhost:5000/posts
 router.get('/', getPosts);
-router.post('/', createPost);
-router.patch('/:id', updatePost);
-router.delete('/:id', deletePost);
-router.patch('/:id/likePost', likePost);
-
-
-
-
+router.post('/', auth, createPost);
+router.patch('/:id',auth, updatePost);   //icon only visible to its owner(handled by frontend), auth not required 
+router.delete('/:id', auth,deletePost);   //icon only visible to its owner(handled by frontend) auth not required
+router.patch('/:id/likePost', auth,likePost);
 
 export default router;

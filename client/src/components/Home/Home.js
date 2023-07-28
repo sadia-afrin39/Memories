@@ -6,6 +6,7 @@ import Posts from '../Posts/Posts.js';
 import Form from '../Form/Form.js';
 import {getPosts} from '../../actions/posts.js';
 import useStyles from './styles.js';
+import Pagination from '../Pagination.jsx';
 
 const Home = () => {
     const [currentId, setCurrentId] = useState(null);
