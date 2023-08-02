@@ -7,7 +7,7 @@ export const getPostsBySearch =  async (req,res) =>{
         const title = new RegExp(searchQuery, 'i');
         //console.log(title);
         const posts = await PostMessage.find({$or : [{title},{message:title},{name: title},{tags: {$in: tags.split(',') }} ] });
-        res.status(200).json(posts);
+        res.status(200).json({data:posts});
     }catch(error){
         res.status(404).json({ message: error.message })  ;  
     }
@@ -90,4 +90,15 @@ export const likePost = async (req, res) =>{
 
     const updatedPost = await PostMessage.findByIdAndUpdate(_id, post, {new: true} );
     res.json(updatedPost);
+}
+
+export const commentPost = async (req, res) =>{
+    const {id: _id} = req.params;
+    const {value} = req.body;
+
+     const post = await PostMessage.findById(_id);
+
+   post.comments.push(value);
+   const updatedPost = await PostMessage.findByIdAndUpdate(_id, post, {new: true} );
+   res.json(updatePost);
 }
